@@ -94,7 +94,7 @@ create table github
       review_comments     UInt32,
       member_login        LowCardinality(String)
     )
-  engine = Kafka('kafka:9092', 'github', 'clickhouse',
+  engine = Kafka('broker:9092', 'github', 'clickhouse',
                  'JSONEachRow') settings kafka_thread_per_consumer = 0, kafka_num_consumers = 1;
 ```
 
