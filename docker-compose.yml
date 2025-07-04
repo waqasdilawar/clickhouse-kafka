@@ -32,6 +32,7 @@ services:
       - "18123:8123"   # HTTP interface
       - "19000:9000"   # Native TCP interface
       - "9009:9009"   # gRPC interface (optional, can be removed)
+      - "9363:9363"   #metrics
     environment:
       CLICKHOUSE_DB: default
       CLICKHOUSE_PASSWORD: changeme
@@ -39,6 +40,7 @@ services:
       # Increase the number of simultaneously open files a bit
       CLICKHOUSE_ULIMIT_NOFILE: 262144
     volumes:
+      - ./config/config.xml:/etc/clickhouse-server/config.d/clickhouse-config.xml
       - clickhouse-data:/var/lib/clickhouse
       - clickhouse-logs:/var/log/clickhouse-server
     depends_on:
