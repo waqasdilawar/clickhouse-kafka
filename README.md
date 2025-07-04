@@ -194,6 +194,56 @@ from github_mv g
 where g.created_at = '2019-09-23 11:25:54';
 ```
 
+### Kafka Simple Produce/Consume Example
+
+```clickhouse
+-- Create Kafka producer table and MergeTree source
+create table kafka_push
+(
+  ID   UInt64,
+  Name String
+) engine = Kafka('broker:29092', 'kafka_push1', 'cgroup1', 'JSONEachRow');
+
+create table kafka_mt_push
+(
+  ID   UInt64,
+  Name String
+) engine = MergeTree()
+  order by ID;
+
+create materialized view kafka_mv_push to kafka_push as
+select
+  ID,
+  Name
+from kafka_mt_push;
+
+-- Produce messages
+insert into kafka_mt_push values (1, 'a'), (2, 'b');
+
+-- Create Kafka consumer table and MergeTree destination
+create table kafka_pull
+(
+  ID   UInt64,
+  Name String
+) engine = Kafka('broker:29092', 'kafka_push1', 'cgroup1', 'JSONEachRow');
+
+create table kafka_mt_pull
+(
+  ID   UInt64,
+  Name String
+) engine = MergeTree()
+  order by ID;
+
+create materialized view kafka_mv_pull to kafka_mt_pull as
+select
+  ID,
+  Name
+from kafka_pull;
+
+-- Consume messages
+select * from kafka_mt_pull;
+```
+
 ## Monitoring with Prometheus
 
 ClickHouse can expose its internal metrics in Prometheus format via the HTTP interface (default port `9363`).
