@@ -193,3 +193,34 @@ from github_mv g
        join github_pr_mv g2 on g.number = g2.pr_number
 where g.created_at = '2019-09-23 11:25:54';
 ```
+
+## Monitoring with Prometheus
+
+ClickHouse can expose its internal metrics in Prometheus format via the HTTP interface (default port `9363`).
+
+1. Add below to your `config/config.xml`:
+
+```xml
+<clickhouse>
+   <prometheus>
+      <endpoint>/metrics</endpoint>
+      <port>9363</port>
+      <metrics>true</metrics>
+      <events>true</events>
+      <asynchronous_metrics>true</asynchronous_metrics>
+      <status_info>true</status_info>
+   </prometheus>
+</clickhouse>
+```
+
+2. Add the following scrape configuration to your `prometheus.yml`:
+
+```yaml
+scrape_configs:
+  - job_name: clickhouse
+    static_configs:
+      - targets: ['<CLICKHOUSE_HOST>:9363']  # or use 'localhost:9363' if using the default HTTP port
+    metrics_path: /metrics
+```
+
+3. Reload Prometheus. You should now see ClickHouse metrics under the `clickhouse_` prefix.
