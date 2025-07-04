@@ -106,7 +106,7 @@ select *
 from github_queue;
 ```
 
-# Produce the data to the topic
+# Produce the [data](https://datasets-documentation.s3.eu-west-3.amazonaws.com/kafka/github_all_columns.ndjson) to the topic
 
 ```bash
    cat github_all_columns.ndjson | kcat -P -b localhost:9092   -t github 
